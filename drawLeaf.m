@@ -1,9 +1,17 @@
-% create single leaf texture
+% function to create single leaf texture matrix
 
 % INPUTS:
+%   lLum = luminance of leaf
+%   lWidth = width of leaf
+%   lHeights = 1*2 matrix with height of upper and lower parts of leaf
+%   lPeaks = 1*2 matrix with location on x axis of upper and lower peaks of leaf
 
+% OUTPUTS:
+%   leafMat = luminance matrix describing single leaf
 
-function coords = drawLeaf(lLum,lWidth,lHeights,lPeaks)
+% ----------------------------------------------------------------- %
+
+function leafMat = drawLeaf(lLum,lWidth,lHeights,lPeaks)
 
 x = [1,lPeaks(1),lWidth;1,lPeaks(2),lWidth];
 y = [1,lHeights(1),1;1,lHeights(2),1];
@@ -43,8 +51,6 @@ for side = 1:2 % top and bottom of leaf
         
     end
     
-    
-    
 end
 
 coords = round(coords);
@@ -53,9 +59,14 @@ coords = round(coords);
 
 % MAKE LEAF TEXTURE OUT OF LINES
 
-    texMatUp = zeros(lHeights(1),lWidth);
-    texMatDown = zeros(lHeights(2),lWidth);
+texMatUp = zeros(lHeights(1),lWidth);
+texMatDown = zeros(lHeights(2),lWidth);
+for i = 1:lWidth
+    texMatUp(1:coords(2,i),i) = lLum;
+    texMatDown(1:coords(2,i),i) = lLum;
+end
+texMatDown = flip(texMatDown,1);
 
-
+leafMat = [texMatDown;texMatUp]; % WHY IS 0,0 NOT IN THE BOTTOM LEFT?????????? FUCKING CATHODES
 
 end

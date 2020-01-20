@@ -35,23 +35,8 @@ try
     lHeights = [75,75];
     lPeaks = [100,100];
 
-    
-    coords = drawLeaf(lLum,lWidth,lHeights,lPeaks);
-    
-    texMatUp = zeros(lHeights(1),lWidth);
-    texMatDown = zeros(lHeights(2),lWidth);
-    
-    for i = 1:lWidth
-        
-        texMatUp(1:coords(2,i),i) = lLum;
-        texMatDown(1:coords(2,i),i) = lLum;
-        
-    end
-    
-    texMatDown = flip(texMatDown,1);
-    texMat = [texMatDown;texMatUp]; % WHY IS 0,0 NOT IN THE BOTTOM LEFT?????????? FUCKING CATHODES
-    
-    leafTexture = Screen('MakeTexture',w,texMat);
+    leafMat = drawLeaf(lLum,lWidth,lHeights,lPeaks);
+    leafTexture = Screen('MakeTexture',w,leafMat);
     Screen('DrawTexture',w,leafTexture,[],[],45);
     
     Screen('Flip',w,[],1);
