@@ -21,7 +21,7 @@ PsychImaging('PrepareConfiguration');
 PsychImaging('AddTask', 'General', 'FloatingPoint32BitIfPossible');
 PsychImaging('AddTask', 'General', 'UseRetinaResolution'); % also use entire display pixel capactiy
 % more screen set-up
-[w,rect] = PsychImaging('OpenWindow', screenMax, 128);
+[w,rect] = PsychImaging('OpenWindow', screenMax, 0);
 [xCenter,yCenter]=RectCenter(rect); % screen center co-ordinates
 [width, height] = RectSize(rect); % window size for easy referral
 
@@ -30,12 +30,12 @@ PsychImaging('AddTask', 'General', 'UseRetinaResolution'); % also use entire dis
 try
     
     lum = 128;
-    width = 300;
-    apex = 140;
-    height = 150;
+    width = 250;
+    apex = 100;
+    height = 75;
     
     x = [1,apex,width;1,apex,width];
-    y = [1,height,1;1,-height,1];
+    y = [1,height,1;1,height,1];
     
     coords = drawLeaf(x,y);
     
@@ -44,12 +44,16 @@ try
     
     for i = 1:width
         
-        texMatTop(coords(2,i):size(texMatTop,1),i) = lum;
+        texMatTop(1:coords(2,i),i) = lum;
+        texMatBottom(1:coords(2,i),i) = lum;
         
     end
     
-    leafTop = Screen('MakeTexture',w,texMatTop);
-    Screen('DrawTexture',w,leafTop);
+    texMatBottom = flip(texMatBottom,1);
+    texMat = [texMatBottom;texMatTop]; % WHY IS 0,0 NOT IN THE BOTTOM LEFT?????????? FUCKING CATHODES
+    
+    leafTexture = Screen('MakeTexture',w,texMat);
+    Screen('DrawTexture',w,leafTexture,[],[],45);
     
     Screen('Flip',w,[],1);
     
