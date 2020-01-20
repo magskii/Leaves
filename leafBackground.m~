@@ -30,12 +30,14 @@ PsychImaging('AddTask', 'General', 'UseRetinaResolution'); % also use entire dis
 try
     
     lum = 128;
-    width = 300;
-    apex = 140;
-    height = 150;
+    width = 250;
+    apexUp = 100;
+    apexDown = 100;
+    heightUp = 75;
+    heightDown = 75;
     
-    x = [1,apex,width;1,apex,width];
-    y = [1,height,1;1,height,1];
+    x = [1,apexUp,width;1,apexDown,width];
+    y = [1,heightTop,1;1,heightDown,1];
     
     coords = drawLeaf(x,y);
     
@@ -50,10 +52,10 @@ try
     end
     
     texMatBottom = flip(texMatBottom,1);
-    texMat = [texMatBottom;texMatTop]; % WHY IS 0,0 NOT IN THE BOTTOM LEFT?????????? FUCKING CATHODE
+    texMat = [texMatBottom;texMatTop]; % WHY IS 0,0 NOT IN THE BOTTOM LEFT?????????? FUCKING CATHODES
     
     leafTexture = Screen('MakeTexture',w,texMat);
-    Screen('DrawTexture',w,leafTexture);
+    Screen('DrawTexture',w,leafTexture,[],[],45);
     
     Screen('Flip',w,[],1);
     

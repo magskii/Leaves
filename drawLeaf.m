@@ -3,7 +3,10 @@
 % INPUTS:
 
 
-function coords = drawLeaf(x,y)
+function coords = drawLeaf(lLum,lWidth,lHeights,lPeaks)
+
+x = [1,lPeaks(1),lWidth;1,lPeaks(2),lWidth];
+y = [1,lHeights(1),1;1,lHeights(2),1];
 
 % ----------------------------------------------------------------- %
 
@@ -49,6 +52,9 @@ coords = round(coords);
 % ----------------------------------------------------------------- %
 
 % MAKE LEAF TEXTURE OUT OF LINES
+
+    texMatUp = zeros(lHeights(1),lWidth);
+    texMatDown = zeros(lHeights(2),lWidth);
 
 
 
