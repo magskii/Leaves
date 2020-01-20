@@ -1,31 +1,52 @@
 % create single leaf texture
 
-function drawLeaf(x,y) = leafTex
+% INPUTS:
 
-for point = 2:3
+
+function coords = drawLeaf(x,y)
+
+% ----------------------------------------------------------------- %
+
+% GET LINE CO-ORDINATES
+
+% start co-ordinate matrix with x-values
+coords = [x(1,1):x(1,3)];
+
+% work out y-values
+for side = 1:2 % top and bottom of leaf
     
-    xPlot = x(point-1):x(point);
-    n = x(point) - x(point-1);
-    if point == 2
-        n = n+1;
+    yPoints = [];
+    
+    for point = 2:3 % two parts of line
+        
+        xPlot = x(side,point-1):x(side,point);
+        n = x(side,point) - x(side,point-1);
+        if point == 2
+            n = n+1;
+        end
+        
+        for i = 1:n
+            mew(i) = ((xPlot(i)) - x(side,point-1)) / (x(side,point) - x(side,point-1));
+            mew2(i) = (1-cos(mew(i)*pi))/2;
+            yPoints(i) = (y(side,point-1)*(1-mew2(i))+y(side,point)*mew2(i));
+        end
+        
+        if point == 2
+            yPlot = [yPoints];
+        else
+            yPlot = [yPlot,yPoints];
+            coords(side+1,:) = yPlot;
+        end
+        
     end
     
-    for i = 1:n
-        mew(i) = ((xPlot(i)) - x(point-1)) / (x(point) - x(point-1));
-        mew2(i) = (1-cos(mew(i)*pi))/2;
-        yPoints(i) = (y(point-1)*(1-mew2(i))+y(point)*mew2(i));
-    end
     
-    if point == 2
-        yPlot = [yPoints];
-    else
-        yPlot = [yPlot,yPoints];
-    end
     
 end
 
-xPlot = [x(1):x(3)];
+coords = round(coords);
 
+% ----------------------------------------------------------------- %
 
 
 

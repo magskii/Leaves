@@ -29,18 +29,27 @@ PsychImaging('AddTask', 'General', 'UseRetinaResolution'); % also use entire dis
 
 try
     
-    for i = 1:nLeaves
+    lum = 128;
+    width = 300;
+    apex = 140;
+    height = 150;
+    
+    x = [1,apex,width;1,apex,width];
+    y = [1,height,1;1,-height,1];
+    
+    coords = drawLeaf(x,y);
+    
+    texMatTop = zeros(height,width);
+    texMatBottom = zeros(height,width);
+    
+    for i = 1:width
         
-        % new leaf parameter
-        lLum = randi([lumMin,lumMax],1);
-        lWidth = randi([minSize,maxSize],1);
-        lHeight = randi([minSize,maxSize],1);
-        lLoc = [randi([0-maxSize,width],1),randi([0-maxSize,height],1)];
-        lRect = [lLoc(1),lLoc(2),lLoc(1)+lWidth,lLoc(2)+lHeight];
-        
-        Screen('FillOval',w,lLum,lRect);
+        texMatTop(coords(2,i):size(texMatTop,1),i) = lum;
         
     end
+    
+    leafTop = Screen('MakeTexture',w,texMatTop);
+    Screen('DrawTexture',w,leafTop);
     
     Screen('Flip',w,[],1);
     
