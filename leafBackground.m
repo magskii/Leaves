@@ -8,8 +8,8 @@ clear all;
 nLeaves = 1;
 lumMin = 55;
 lumMax = 200;
-minSize = 100;
-maxSize = 300;
+minWidth = 100;
+maxWidth = 300;
 
 % ----------------------------------------------------------------- %
 
@@ -28,7 +28,7 @@ PsychImaging('AddTask', 'General', 'UseRetinaResolution'); % also use entire dis
 % ----------------------------------------------------------------- %
 
 try
-    
+    % NEED TO RANDOMISE!!
     % define random leaf paramaters within ranges
     lLum = 128;
     lWidth = 250;
@@ -36,6 +36,10 @@ try
     lPeaks = [100,100];
 
     leafMat = drawLeaf(lLum,lWidth,lHeights,lPeaks);
+    
+    % NEED TO PICK OUT LEAF LUM AND DRAW ON BACKGROUND
+    % RANDOMISE LOCATION AND ROTATION - make texture then pull texture?
+    
     leafTexture = Screen('MakeTexture',w,leafMat);
     Screen('DrawTexture',w,leafTexture,[],[],45);
     

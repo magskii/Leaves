@@ -8,8 +8,8 @@ clear all;
 nLeaves = 1;
 lumMin = 55;
 lumMax = 200;
-minSize = 100;
-maxSize = 300;
+minWidth = 100;
+maxWidth = 300;
 
 % ----------------------------------------------------------------- %
 
@@ -28,28 +28,18 @@ PsychImaging('AddTask', 'General', 'UseRetinaResolution'); % also use entire dis
 % ----------------------------------------------------------------- %
 
 try
-    
+    % NEED TO RANDOMISE!!
     % define random leaf paramaters within ranges
     lLum = 128;
     lWidth = 250;
     lHeights = [75,75];
     lPeaks = [100,100];
 
+    leafMat = drawLeaf(lLum,lWidth,lHeights,lPeaks);
     
-    leafTexture = drawLeaf(lLum,lWidth,lHeights,lPeaks);
+    % NEED TO PICK P
     
-%     texMatUp = zeros(lHeights(1),lWidth);
-%     texMatDown = zeros(lHeights(2),lWidth);
-%     
-%     for i = 1:lWidth
-%         texMatUp(1:coords(2,i),i) = lLum;
-%         texMatDown(1:coords(2,i),i) = lLum;
-%     end
-%     
-%     texMatDown = flip(texMatDown,1);
-%     texMat = [texMatDown;texMatUp]; % WHY IS 0,0 NOT IN THE BOTTOM LEFT?????????? FUCKING CATHODES
-%     
-%     leafTexture = Screen('MakeTexture',w,texMat);
+    leafTexture = Screen('MakeTexture',w,leafMat);
     Screen('DrawTexture',w,leafTexture,[],[],45);
     
     Screen('Flip',w,[],1);
