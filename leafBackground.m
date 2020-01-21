@@ -12,19 +12,19 @@ backLum = 128;
 Screen('Preference', 'SkipSyncTests', 1); % don't care about timing, so skipping sync tests is fine for now
 screenMax = max(Screen('Screens')); % set screen to be external display if applicable
 PsychImaging('PrepareConfiguration');
-PsychImaging('AddTask', 'General', 'FloatingPoint32BitIfPossible');
-PsychImaging('AddTask', 'General', 'UseRetinaResolution'); % also use entire display pixel capactiy
+PsychImaging('AddTask', 'General', 'FloatingPoint32BitIfPossible'); % can't remember what this does...
+PsychImaging('AddTask', 'General', 'UseRetinaResolution'); % use entire display pixel capactiy
 [w,rect] = PsychImaging('OpenWindow', screenMax,backLum);
 [xCenter,yCenter]=RectCenter(rect); % screen center co-ordinates
 [width, height] = RectSize(rect); % window size for easy referral
 
 % ----------------------------------------------------------------- %
 
-nLeaves = 5000;
+nLeaves = 2000;
 lumRange = [55,200];
 angleRange = [1,360];
-widthRange = [100,500];
-heightRange = [20,150];
+widthRange = [300,600];
+heightRange = [20,400];
 
 edgeBuffer = widthRange(2) + 100;
 
