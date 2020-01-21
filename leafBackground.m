@@ -11,11 +11,9 @@ clear all;
 backLum = 128;
 Screen('Preference', 'SkipSyncTests', 1); % don't care about timing, so skipping sync tests is fine for now
 screenMax = max(Screen('Screens')); % set screen to be external display if applicable
-% set up for alpha blending - allows overlapping gabors and removes square edges
 PsychImaging('PrepareConfiguration');
 PsychImaging('AddTask', 'General', 'FloatingPoint32BitIfPossible');
 PsychImaging('AddTask', 'General', 'UseRetinaResolution'); % also use entire display pixel capactiy
-% more screen set-up
 [w,rect] = PsychImaging('OpenWindow', screenMax,backLum);
 [xCenter,yCenter]=RectCenter(rect); % screen center co-ordinates
 [width, height] = RectSize(rect); % window size for easy referral
