@@ -22,7 +22,7 @@ PsychImaging('AddTask', 'General', 'UseRetinaResolution'); % also use entire dis
 
 % ----------------------------------------------------------------- %
 
-nLeaves = 5000;
+nLeaves = 1;
 lumRange = [55,200];
 angleRange = [1,360];
 widthRange = [100,300];
@@ -51,14 +51,13 @@ try
         
         % choose random location to paste, within display
         leafLoc = [randi([edgeBuffer,height+edgeBuffer],1),randi([edgeBuffer,width+edgeBuffer],1)];
-        leafRect = [0,0,size(leafMat)];
-        leafRect = CenterRectOnPoint(leafRect,leafLoc(1),leafLoc(2));
+        leafRect = [1,1,size(leafMat,1))];
         
         % paste leaf onto display
         for pixCol = 1:size(leafMat,1)
             for pixRow = 1:size(leafMat,2)
                 if leafMat(pixCol,pixRow) > 0
-                    display(pixCol+leafRect(1),pixRow+leafRect(2)) = leafMat(pixCol,pixRow);
+                    display(pixCol,pixRow) = leafMat(pixCol,pixRow);
                 end
             end
         end
