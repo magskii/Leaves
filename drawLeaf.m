@@ -63,10 +63,8 @@ texMatDown = flip(texMatDown,1);
 leafMat = [texMatDown;texMatUp]; % WHY IS 0,0 NOT IN THE BOTTOM LEFT?????????? FUCKING CATHODES
 
 % rotate leaf matrix
-leafMat = imrotate(leafMat,lAngle,'bilinear'); % rotate
-% this type of rotation creates smoother edges, but if you want block
-% colour edges, uncomment the loop below
-for i = 1:numel(leafMat) % convert back to all same luminance
+leafMat = imrotate(leafMat,lAngle,'bilinear');
+for i = 1:numel(leafMat) % convert back to all same luminance (makes edges more jaggedy, but removes edge artifacts after pasting)
     if leafMat(i) > 0
         leafMat(i) = lLum;
     end
