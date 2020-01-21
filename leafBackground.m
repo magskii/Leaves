@@ -4,6 +4,9 @@ clear all;
 
 % ----------------------------------------------------------------- %
 
+backLum = 128;
+
+
 nLeaves = 1;
 lumMin = 55;
 lumMax = 200;
@@ -20,28 +23,44 @@ PsychImaging('PrepareConfiguration');
 PsychImaging('AddTask', 'General', 'FloatingPoint32BitIfPossible');
 PsychImaging('AddTask', 'General', 'UseRetinaResolution'); % also use entire display pixel capactiy
 % more screen set-up
-[w,rect] = PsychImaging('OpenWindow', screenMax, 0);
+[w,rect] = PsychImaging('OpenWindow', screenMax,backLum);
 [xCenter,yCenter]=RectCenter(rect); % screen center co-ordinates
-[lWidth, height] = RectSize(rect); % window size for easy referral
+[width, height] = RectSize(rect); % window size for easy referral
 
 % ----------------------------------------------------------------- %
 
 try
-    % NEED TO RANDOMISE!!
-    % define random leaf paramaters within ranges
-    lLum = 128;
-    lWidth = 250;
-    lHeights = [75,75];
-    lPeaks = [100,100];
-
-    leafMat = drawLeaf(lLum,lWidth,lHeights,lPeaks);
     
-    % NEED TO PICK OUT LEAF LUM AND DRAW ON BACKGROUND
-    % RANDOMISE LOCATION AND ROTATION - make texture then pull texture?
+    % create blank mean-luminance display matrix
+    display = zeros(height,width) + backLum;
     
-    leafTexture = Screen('MakeTexture',w,leafMat);
-    Screen('DrawTexture',w,leafTexture,[],[],45);
+    for i = 1:nLeaves
+        
+        % NEED TO RANDOMISE!!
+        % define random leaf paramaters within ranges
+        lLum = 255;
+        lAngle = 45;
+        lWidth = 250;
+        lHeights = [75,75];
+        lPeaks = [100,100];
+        
+        % draw leaf based on parameters
+        leafMat = drawLeaf(lLum,lAngle,lWidth,lHeights,lPeaks);
+        
+        % paste leaf onto display
+        for pixCol = 1:size(leafMat,1)
+            for pixRow = 1:size(leafMat,2)
+                if leafMat(pixCol,pixRow) > 0
+                    display(pixCol,pixRow) = leafMat(pixCol,pixRow);
+                end
+            end
+        end
+        
+    end
     
+    % throw image onto screen
+    dispTexture = Screen('MakeTexture',w,display);
+    Screen('DrawTexture',w,dispTexture);
     Screen('Flip',w,[],1);
     
     KbWait;

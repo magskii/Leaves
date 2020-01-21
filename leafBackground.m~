@@ -1,9 +1,11 @@
 % draw backgrounds containing multiple leaves
 
-
 clear all;
 
 % ----------------------------------------------------------------- %
+
+backLum = 128;
+
 
 nLeaves = 1;
 lumMin = 55;
@@ -21,26 +23,41 @@ PsychImaging('PrepareConfiguration');
 PsychImaging('AddTask', 'General', 'FloatingPoint32BitIfPossible');
 PsychImaging('AddTask', 'General', 'UseRetinaResolution'); % also use entire display pixel capactiy
 % more screen set-up
-[w,rect] = PsychImaging('OpenWindow', screenMax, 0);
+[w,rect] = PsychImaging('OpenWindow', screenMax,backLum);
 [xCenter,yCenter]=RectCenter(rect); % screen center co-ordinates
-[lWidth, height] = RectSize(rect); % window size for easy referral
+[width, height] = RectSize(rect); % window size for easy referral
 
 % ----------------------------------------------------------------- %
 
 try
+    
+    % create blank display matrix
+    display = zeros(height,width) + backLum;
+    
     % NEED TO RANDOMISE!!
     % define random leaf paramaters within ranges
-    lLum = 128;
+    lLum = 255;
     lWidth = 250;
     lHeights = [75,75];
     lPeaks = [100,100];
-
+    
     leafMat = drawLeaf(lLum,lWidth,lHeights,lPeaks);
     
-    % NEED TO PICK P
+    % NEED TO PICK OUT LEAF LUM AND DRAW ON BACKGROUND
+    % RANDOMISE LOCATION AND ROTATION - make texture then pull texture?
+    
+    for pixel = 1:numel(leafMat) % convert back to all same luminance
+        if leafMat(pixel) > 0
+            display(pixel) = leafMat(pixel);
+        end
+    end
+    
     
     leafTexture = Screen('MakeTexture',w,leafMat);
-    Screen('DrawTexture',w,leafTexture,[],[],45);
+    
+    
+    
+    Screen('DrawTexture',w,leafTexture);
     
     Screen('Flip',w,[],1);
     
@@ -58,7 +75,3 @@ catch e
     sca;
     
 end
-
-
-% ----------------------------------------------------------------- %
-
