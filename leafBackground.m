@@ -1,21 +1,14 @@
+
 % draw backgrounds containing multiple leaves
+
+% SORT ASYMMETRIC PEAKS + HEIGHTS
 
 clear all;
 
 % ----------------------------------------------------------------- %
 
-backLum = 128;
-
-
-nLeaves = 1;
-lumMin = 55;
-lumMax = 200;
-minWidth = 100;
-maxWidth = 300;
-
-% ----------------------------------------------------------------- %
-
 % screen set-up
+backLum = 128;
 Screen('Preference', 'SkipSyncTests', 1); % don't care about timing, so skipping sync tests is fine for now
 screenMax = max(Screen('Screens')); % set screen to be external display if applicable
 % set up for alpha blending - allows overlapping gabors and removes square edges
@@ -29,6 +22,12 @@ PsychImaging('AddTask', 'General', 'UseRetinaResolution'); % also use entire dis
 
 % ----------------------------------------------------------------- %
 
+nLeaves = 1;
+lumRange = [55,200];
+angleRange = [1,360];
+widthRange = [100,300];
+heightRange = [20,150];
+
 try
     
     % create blank mean-luminance display matrix
@@ -36,16 +35,19 @@ try
     
     for i = 1:nLeaves
         
-        % NEED TO RANDOMISE!!
         % define random leaf paramaters within ranges
-        lLum = 255;
-        lAngle = 45;
-        lWidth = 250;
-        lHeights = [75,75];
-        lPeaks = [100,100];
+        lLum = randi([lumRange(1),lumRange(2)],1);
+        lAngle = randi([angleRange(1),angleRange(2)],1);
+        lWidth = randi([widthRange(1),widthRange(2)],1);
+        peakMax = round(lWidth/2)-10;
+        lPeaks = randi([10,peakMax],[1,2]);
+        lHeights = randi([heightRange(1),heightRange(2)],[1,2]);
         
         % draw leaf based on parameters
         leafMat = drawLeaf(lLum,lAngle,lWidth,lHeights,lPeaks);
+        
+        % choose random location to paste
+        % randloc = 
         
         % paste leaf onto display
         for pixCol = 1:size(leafMat,1)
@@ -64,7 +66,6 @@ try
     Screen('Flip',w,[],1);
     
     KbWait;
-    % close psychtoolbox
     Priority(0);
     sca;
     
