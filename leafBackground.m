@@ -25,7 +25,7 @@ PsychImaging('AddTask', 'General', 'UseRetinaResolution'); % also use entire dis
 nLeaves = 5000;
 lumRange = [55,200];
 angleRange = [1,360];
-widthRange = [100,300];
+widthRange = [100,500];
 heightRange = [20,150];
 
 edgeBuffer = widthRange(2) + 100;
