@@ -8,7 +8,7 @@ clear all;
 % ----------------------------------------------------------------- %
 
 % screen set-up
-backLum = 128;
+backLum = 0;
 Screen('Preference', 'SkipSyncTests', 1); % don't care about timing, so skipping sync tests is fine for now
 screenMax = max(Screen('Screens')); % set screen to be external display if applicable
 PsychImaging('PrepareConfiguration');
@@ -29,13 +29,19 @@ angleRange = [1,360];
 widthRange = [100,300];
 heightRange = [25,200];
 
+% target specs
+targLum = round(lumRange(1)+((lumRange(2)-lumRange(1))/2)); % mid-leaf luminance
+targHeight = round(heightRange(1)+((heightRange(2)-heightRange(1))/2)); % mid-leaf height
+targWidth = round(widthRange(1)+((widthRange(2)-widthRange(1))/2)); % mid-leaf width
+
 % location specs
 SOP = 1; % 'side or patch'      0 = whole screen, 1 = sides, 2 = patches
 switch SOP
     case 0
         % may or may not need this...
     case 1 % define side perameters
-        compSide = 1; % 1 = left, 2 = right
+        compSide = 1; % which side is complex       1 = left, 2 = right, 3 = top, 4 = bottom
+        targSide = 1; % which side does the target appear on       0 = simple side, 1 = complex side
         compType = 1; % 1 = number, 2 = luminance, 3 = size, etc.
         switch compType
             case 1
@@ -53,7 +59,7 @@ end
 
 % ----------------------------------------------------------------- %
 
-% DERIVED VARIABLES
+% DERIVED VARIABLES - boring, make into separate function
 
 % define size of buffer so leaves can go a bit over edge of screen
 edgeBuffer = widthRange(2);
@@ -62,7 +68,9 @@ edgeBuffer = widthRange(2);
 switch SOP
     case 0
         % may or may not need this...
-    case 1 % define side perameters
+        
+    case 1 % define side condition perameters
+        
         % start by defining left/right/up/down
         halfWidth = width/2;
         halfHeight = height/2;
@@ -92,6 +100,20 @@ switch SOP
                 wCompRange = [edgeBuffer,width+edgeBuffer];
                 wSimpRange = [edgeBuffer,width+edgeBuffer];
         end
+        
+        % then sort target location
+        switch targSide
+            case 0 % simple side
+                targHeightRange = [hSimpRange(1)+round((targHeight/2)),hSimpRange(2)-round((targHeight/2))];
+                targWidthRange = [wSimpRange(1)+round((targWidth/2)),wSimpRange(2)-round((targWidth/2))];
+            case 1 % complex side
+                targHeightRange = [hCompRange(1)+round((targHeight/2)),hCompRange(2)-round((targHeight/2))];
+                targWidthRange = [wCompRange(1)+round((targWidth/2)),wCompRange(2)-round((targWidth/2))];
+        end
+        targLoc = [randi([targHeightRange],1),randi([targWidthRange],1)];
+        targRect = [0,0,targWidth,targHeight];
+        targRect = CenterRectOnPoint(targRect,targLoc(1),targLoc(2));
+        
         % then sort complexity things
         switch compType
             case 1 % number
@@ -110,7 +132,7 @@ end
 
 % ----------------------------------------------------------------- %
 
-% DRAW LEAVES
+% DRAW LEAVES AND TARGET
 
 try
     
@@ -149,12 +171,13 @@ try
             end
         end
         
-        
     end
     
-    % throw image onto screen
+    % throw leaves and target onto screen
     dispTexture = Screen('MakeTexture',w,display);
     Screen('DrawTexture',w,dispTexture);
+    Screen('FillOval',w,targLum,targRect);
+    
     Screen('Flip',w,[],1);
     
     KbWait;
