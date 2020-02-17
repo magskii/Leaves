@@ -23,7 +23,7 @@ PsychImaging('AddTask', 'General', 'UseRetinaResolution'); % use entire display 
 % MANIPULATION VARIABLES
 
 % leaf specs
-nLeaves = 100;
+nLeaves = 3000;
 lumRange = [55,200];
 angleRange = [1,360];
 widthRange = [100,300];
@@ -39,7 +39,7 @@ switch SOP
         compType = 1; % 1 = number, 2 = luminance, 3 = size, etc.
         switch compType
             case 1
-                numDiff = 0.75; % percentage of leaves displayed on complex side (to nearest leaf...)
+                numDiff = 0.8; % percentage of leaves displayed on complex side (to nearest leaf...)
             case 2
                 % luminance ranges (high and low)
             case 3
@@ -63,6 +63,36 @@ switch SOP
     case 0
         % may or may not need this...
     case 1 % define side perameters
+        % start by defining left/right/up/down
+        halfWidth = width/2;
+        halfHeight = height/2;
+        switch compSide
+            case 1 % left
+                midline = edgeBuffer + halfWidth;
+                wCompRange = [edgeBuffer, midline];
+                wSimpRange = [midline, width+edgeBuffer];
+                hCompRange = [edgeBuffer,height+edgeBuffer];
+                hSimpRange = [edgeBuffer,height+edgeBuffer];
+            case 2 % right
+                midline = edgeBuffer + halfWidth;
+                wCompRange = [midline, width+edgeBuffer];
+                wSimpRange = [edgeBuffer, midline];
+                hCompRange = [edgeBuffer,height+edgeBuffer];
+                hSimpRange = [edgeBuffer,height+edgeBuffer];
+            case 3 % top
+                midline = edgeBuffer + halfHeight;
+                hCompRange = [edgeBuffer, midline];
+                hSimpRange = [midline, height+edgeBuffer];
+                wCompRange = [edgeBuffer,width+edgeBuffer];
+                wSimpRange = [edgeBuffer,width+edgeBuffer];
+            case 4 % bottom
+                midline = edgeBuffer + halfHeight;
+                hCompRange = [midline, height+edgeBuffer];
+                hSimpRange = [edgeBuffer, midline];
+                wCompRange = [edgeBuffer,width+edgeBuffer];
+                wSimpRange = [edgeBuffer,width+edgeBuffer];
+        end
+        % then sort complexity things
         switch compType
             case 1 % number
                 compNum = round(nLeaves*numDiff);
@@ -100,17 +130,13 @@ try
         % draw leaf based on parameters
         leafMat = drawLeaf(lLum,lAngle,lWidth,lHeights,lPeaks);
         
+        % choose random leaf location within pre-defined area (e.g. specific side)
         switch drawingSide(i)
-            case 0 % simple
-                % draw on other side
-                % define half width here and replace in leafLoc below
+            case 0 % draw on simple side
+                leafLoc = [randi([hSimpRange],1),randi([wSimpRange],1)];
             case 1 % complex
-                % draw on chosen complex side (compSide)
-                % define half width here and replace in leafLoc below
+                leafLoc = [randi([hCompRange],1),randi([wCompRange],1)];
         end
-        
-        % choose random location to paste, within display
-        leafLoc = [randi([edgeBuffer,height+edgeBuffer],1),randi([edgeBuffer,width+edgeBuffer],1)];
         leafRect = [0,0,size(leafMat)];
         leafRect = CenterRectOnPoint(leafRect,leafLoc(1),leafLoc(2));
         

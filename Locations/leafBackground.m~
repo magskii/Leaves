@@ -63,6 +63,36 @@ switch SOP
     case 0
         % may or may not need this...
     case 1 % define side perameters
+        % start by defining left/right/up/down
+        halfWidth = width/2;
+        halfHeight = height/2;
+        switch compSide
+            case 1 % left
+                midline = edgeBuffer + halfWidth;
+                wCompRange = [edgeBuffer, midline];
+                wSimpRange = [midline, width+edgeBuffer];
+                hCompRange = [edgeBuffer,height+edgeBuffer];
+                hSimpRange = [edgeBuffer,height+edgeBuffer];
+            case 2 % right
+                midline = edgeBuffer + halfWidth;
+                wCompRange = [midline, width+edgeBuffer];
+                wSimpRange = [edgeBuffer, midline];
+                hCompRange = [edgeBuffer,height+edgeBuffer];
+                hSimpRange = [edgeBuffer,height+edgeBuffer];
+            case 3 % top
+                midline = edgeBuffer + halfHeight;
+                hCompRange = [edgeBuffer, midline];
+                hSimpRange = [midline, height+edgeBuffer];
+                wCompRange = [edgeBuffer,width+edgeBuffer];
+                wSimpRange = [edgeBuffer,width+edgeBuffer];
+            case 4 % bottom
+                midline = edgeBuffer + halfHeight;
+                hCompRange = [midline, height+edgeBuffer];
+                hSimpRange = [edgeBuffer, midline];
+                wCompRange = [edgeBuffer,width+edgeBuffer];
+                wSimpRange = [edgeBuffer,width+edgeBuffer];
+        end
+        % then sort complexity things
         switch compType
             case 1 % number
                 compNum = round(nLeaves*numDiff);
@@ -101,9 +131,8 @@ try
         leafMat = drawLeaf(lLum,lAngle,lWidth,lHeights,lPeaks);
         
         switch drawingSide(i)
-            case 0 % simple
-                % draw on other side
-                % define half width here and replace in leafLoc below
+            case 0 % draw on simple side
+                leafLoc = [randi([edgeBu,1),randi([edgeBuffer,width+edgeBuffer],1)];
             case 1 % complex
                 % draw on chosen complex side (compSide)
                 % define half width here and replace in leafLoc below
@@ -113,8 +142,6 @@ try
         leafLoc = [randi([edgeBuffer,height+edgeBuffer],1),randi([edgeBuffer,width+edgeBuffer],1)];
         leafRect = [0,0,size(leafMat)];
         leafRect = CenterRectOnPoint(leafRect,leafLoc(1),leafLoc(2));
-        
-        
         
         % paste leaf onto display
         for pixCol = 1:size(leafMat,1)
