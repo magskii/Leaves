@@ -20,11 +20,11 @@ PsychImaging('AddTask', 'General', 'UseRetinaResolution'); % use entire display 
 
 % ----------------------------------------------------------------- %
 
-nLeaves = 2000;
+nLeaves = 300;
 lumRange = [55,200];
 angleRange = [1,360];
-widthRange = [300,600];
-heightRange = [20,400];
+widthRange = [100,300];
+heightRange = [25,200];
 
 edgeBuffer = widthRange(2) + 100;
 
