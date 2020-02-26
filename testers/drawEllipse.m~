@@ -1,0 +1,57 @@
+% funnction to draw an ellipse
+
+% INPUTS:
+% height = y length of ellipse
+% width = x length of ellipse
+% lum = luminance value
+
+height = 400;
+width = 300;
+lum = 128;
+
+% OUTPUTS:
+% ellipseTex = pixel matrix of an ellipse
+% 1s indicate you should draw, 0s leave blank
+
+format long g
+
+% ----------------------------------------------------------------- %
+
+% GET CO-ORDINATES OF ARC
+
+coords = zeros(width+1,2);
+
+radY = height/2;
+radX = width/2;
+
+center = 0+radX;
+
+for i = 1:width+1
+    
+    x = center-radX-1+i;
+    y = sqrt(((radY)^2)*(1-((((x-center)^2))/(radX^2))));
+    
+    coords(i,:) = [x,y];
+    
+end
+
+coords = round(coords);
+
+% ----------------------------------------------------------------- %
+
+% MAKE ELLIPSE MATRIX AND ROTATE
+
+ellipseMat = zeros(radY,radX) ;
+%ellipseMat = ellipseMat + 666; % not a possible luminance
+for i = 1:size(coords,1)
+    if coords(i,2) == 0;
+        ellipseMat(1,i) = lum;
+    else
+        ellipseMat(1:coords(i,2),i) = lum;
+    end
+end
+% ellipseMat = [flip(ellipseMat,1);ellipseMat];
+% 
+
+
+
