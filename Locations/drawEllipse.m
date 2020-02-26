@@ -1,17 +1,13 @@
 % funnction to draw an ellipse
 
-% CURRENTLY BREAKS IF ODD NUMBERS IN HEIGHT OR WIDTH, NEED TO FIX
-
 % INPUTS:
 % height = y length of ellipse
 % width = x length of ellipse
-% luminance = luminance value of ellipse
-% angle = angle of rotation
+% lum = luminance value
 
 % OUTPUTS:
-% baseLum = the background luminance of ellipseMat
 % ellipseMat = pixel matrix of an ellipse
-% NB: to paste in the ellipse, just specify not pasting baseLum values
+% 1s indicate you should draw, 0s leave blank
 
 function [baseLum,ellipseMat] = drawEllipse(height,width,luminance,angle)
 
@@ -55,10 +51,10 @@ ellipseMat = [flip(ellipseMat,1);ellipseMat];
 
 % rotate ellipse
 ellipseMat = imrotate(ellipseMat,angle,'bilinear');
-for i = 1:numel(ellipseMat) % convert back to all same luminance (makes edges more jaggedy, but removes edge artifacts after pasting)
-    if ellipseMat(i) ~= baseLum
-        ellipseMat(i) = luminance;
-    end
-end
+% for i = 1:numel(ellipseMat) % remove edge artifacts
+%     if ellipseMat(i) ~= baseLum
+%         ellipseMat(i) = luminance;
+%     end
+% end
 
 end

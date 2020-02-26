@@ -23,7 +23,7 @@ PsychImaging('AddTask', 'General', 'UseRetinaResolution'); % use entire display 
 % MANIPULATION VARIABLES
 
 % leaf specs
-nLeaves = 3000;
+nLeaves = 50;
 lumRange = [55,200];
 angleRange = [1,360];
 widthRange = [100,300];
@@ -33,15 +33,7 @@ heightRange = [25,200];
 targLum = round(lumRange(1)+((lumRange(2)-lumRange(1))/2)); % mid-leaf luminance
 targHeight = round(heightRange(1)+((heightRange(2)-heightRange(1))/2)); % mid-leaf height
 targWidth = round(widthRange(1)+((widthRange(2)-widthRange(1))/2)); % mid-leaf width
-targAngle = randi([1,360],1);
-
-% bodge to fix drawEllipse odd number problem, remove when fixed
-if mod(targHeight,2)
-    targHeight = targHeight+1;
-end
-if mod(targWidth,2)
-    targWidth = targWidth+2;
-end
+targAngle = 45;
 
 % location specs
 SOP = 1; % 'side or patch'      0 = whole screen, 1 = sides, 2 = patches
@@ -183,11 +175,11 @@ try
     end
     
     % draw and paste in target
-    [baseLum,targMat] = drawEllipse(targHeight,targWidth,targLum,targAngle);
-    for pixCol = 1:size(targMat,1)
-        for pixRow = 1:size(targMat,2)
-            if targMat(pixCol,pixRow) == targLum
-                display(pixCol+targRect(1),pixRow+targRect(2)) = targMat(pixCol,pixRow);
+    [baseLum,targMat] = drawEllipse(400,200,targLum,targAngle);
+    for pixCol = 1:size(leafMat,1)
+        for pixRow = 1:size(leafMat,2)
+            if leafMat(pixCol,pixRow) > 0
+                display(pixCol+leafRect(1),pixRow+leafRect(2)) = leafMat(pixCol,pixRow);
             end
         end
     end
@@ -195,7 +187,9 @@ try
     % throw all onto screen
     dispTexture = Screen('MakeTexture',w,display);
     Screen('DrawTexture',w,dispTexture);
-    Screen('Flip',w);
+    
+    
+    Screen('Flip',w,[],1);
     
     KbWait;
     Priority(0);

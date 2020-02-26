@@ -2,7 +2,7 @@
 clear all;
 
 % screen set-up
-backLum = 0;
+backLum = 100;
 Screen('Preference', 'SkipSyncTests', 1); % don't care about timing, so skipping sync tests is fine for now
 screenMax = max(Screen('Screens')); % set screen to be external display if applicable
 PsychImaging('PrepareConfiguration');
@@ -15,10 +15,10 @@ PsychImaging('AddTask', 'General', 'UseRetinaResolution'); % use entire display 
 
 height = 400;
 width = 300;
-lum = 128;
+lum = 200;
 angle = 45;
 
-target = drawEllipse(height,width,lum,angle);
+[baseLum,target] = drawEllipse(height,width,lum,angle);
 
 
 targetTexture = Screen('MakeTexture',w,target);
