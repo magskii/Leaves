@@ -35,7 +35,7 @@ targHeight = round(heightRange(1)+((heightRange(2)-heightRange(1))/2)); % mid-le
 targWidth = round(widthRange(1)+((widthRange(2)-widthRange(1))/2)); % mid-leaf width
 targAngle = randi([1,360],1);
 
-% bodge to fix drawEllipse odd number problem, remove when fixed
+% bodge to fix drawEllipse odd number problem, can remove when fixed
 if mod(targHeight,2)
     targHeight = targHeight+1;
 end
@@ -50,7 +50,7 @@ switch SOP
         % may or may not need this...
     case 1 % define side perameters
         compSide = 1; % which side is complex       1 = left, 2 = right, 3 = top, 4 = bottom
-        targSide = 1; % which side does the target appear on       0 = simple side, 1 = complex side
+        targSide = 0; % which side does the target appear on       0 = simple side, 1 = complex side
         compType = 1; % 1 = number, 2 = luminance, 3 = size, etc.
         switch compType
             case 1
