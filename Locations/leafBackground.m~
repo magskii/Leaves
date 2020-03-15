@@ -20,20 +20,75 @@ PsychImaging('AddTask', 'General', 'UseRetinaResolution'); % use entire display 
 
 % ----------------------------------------------------------------- %
 
-% MANIPULATION VARIABLES
-
 % leaf specs
-nLeaves = 3000;
-lumRange = [55,200];
+nLeaves = 4000;
 angleRange = [1,360];
 widthRange = [100,300];
 heightRange = [25,200];
 
-% target specs
-targLum = round(lumRange(1)+((lumRange(2)-lumRange(1))/2)); % mid-leaf luminance
-targHeight = round(heightRange(1)+((heightRange(2)-heightRange(1))/2)); % mid-leaf height
-targWidth = round(widthRange(1)+((widthRange(2)-widthRange(1))/2)); % mid-leaf width
-targAngle = randi([1,360],1);
+% TARGET SPECS
+
+targLum = 128; %round(lumRange(1)+((lumRange(2)-lumRange(1))/2)); % mid-leaf luminance
+targAngle = 45; %randi([1,360],1);
+targHeight = 200; %round(heightRange(1)+((heightRange(2)-heightRange(1))/2)); % mid-leaf height
+targWidth = 300; %round(widthRange(1)+((widthRange(2)-widthRange(1))/2)); % mid-leaf width
+
+% ----------------------------------------------------------------- %
+
+% LEAF COMPLEXITY SPECS:
+
+% general
+compType = 1; % type        1 = luminance, 2 = size, 3 = size, etc.
+compLevel = 1; % level      1 = low, 2 = med, 3 = high;
+
+% define low level for each complexity factor
+lumDiff = 30; % max luminance deviation from mean (target) lum
+lumRange = [targLum-lumDiff,targLum+lumDiff];
+sizeDiff = 20; % max width deviation (pixels) from mean (target) width
+widthRange = [targWidth-sizeDiff,targWidth-sizeDiff];
+
+angleDiff = 0;
+numberDiff = 0;
+shapeDiff = 0;
+
+% switch out factor which is varied for this trial, unless it's a control
+if compLevel ~=1
+    switch compType
+        case 1 % luminance
+            switch compLevel
+                case 2
+                    lumDiff = 60;
+                    lumRange = [targLum-lumDiff,targLum+lumDiff];
+                case 3
+                    lumDiff = 90;
+                    lumRange = [targLum-lumDiff,targLum+lumDiff];
+            end
+        case 2 % size
+            switch compLevel
+                case 2
+                    sizeDiff = 20;
+                    widthRange = [targWidth-sizeDiff,targWidth-sizeDiff];
+                case 3
+                    sizeDiff = 20;
+                    widthRange = [targWidth-sizeDiff,targWidth-sizeDiff];
+            end
+        case 3
+            switch compLevel
+                case 2
+                case 3
+            end
+        case 4
+            switch compLevel
+                case 2
+                case 3
+            end
+        case 5
+            switch compLevel
+                case 2
+                case 3
+            end
+    end
+end
 
 % bodge to fix drawEllipse odd number problem, can remove when fixed
 if mod(targHeight,2)
@@ -43,15 +98,17 @@ if mod(targWidth,2)
     targWidth = targWidth+2;
 end
 
-% location specs
-SOP = 0; % 'side or patch'      0 = whole screen, 1 = sides, 2 = patches
+% ----------------------------------------------------------------- %
+
+% COMPLEXITY LOCATION SPECS:
+
+SOP = 0; % location, i.e. 'side or patch'      0 = whole screen, 1 = sides, 2 = patches
 switch SOP
     case 0
         % may or may not need this...
     case 1 % define side perameters
         compSide = 1; % which side is complex       1 = left, 2 = right, 3 = top, 4 = bottom
         targSide = 0; % which side does the target appear on       0 = simple side, 1 = complex side
-        compType = 1; % 1 = number, 2 = luminance, 3 = size, etc.
         switch compType
             case 1
                 numDiff = 0.8; % percentage of leaves displayed on complex side (to nearest leaf...)
@@ -68,7 +125,7 @@ end
 
 % ----------------------------------------------------------------- %
 
-% DERIVED VARIABLES - boring, make into separate function
+% DERIVED VARIABLES - boring, make into separate function for clarity?
 
 % define size of buffer so leaves can go a bit over edge of screen
 edgeBuffer = widthRange(2);
@@ -82,6 +139,8 @@ switch SOP
         locHeightR = [edgeBuffer,height+edgeBuffer];
         
         % generate target location
+        targHeightRange = [locHeightR(1)+round((targHeight/2)),locHeightR(2)-round((targHeight/2))];
+        targWidthRange = [locWidthR(1)+round((targWidth/2)),locWidthR(2)-round((targWidth/2))];
         targLoc = [randi([targHeightRange],1),randi([targWidthRange],1)];
         targRect = [0,0,targWidth,targHeight];
         targRect = CenterRectOnPoint(targRect,targLoc(1),targLoc(2));
@@ -196,6 +255,9 @@ try
         end
         
     end
+    
+    %FOR TESTING ONLY!!
+    targLum = 1;
     
     % draw and paste in target
     [baseLum,targMat] = drawEllipse(targHeight,targWidth,targLum,targAngle);
