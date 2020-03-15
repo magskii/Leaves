@@ -82,8 +82,6 @@ switch SOP
         locHeightR = [edgeBuffer,height+edgeBuffer];
         
         % generate target location
-        targHeightRange = [locHeightR(1)+round((targHeight/2)),locHeightR(2)-round((targHeight/2))];
-        targWidthRange = [locWidthR(1)+round((targWidth/2)),locWidthR(2)-round((targWidth/2))];
         targLoc = [randi([targHeightRange],1),randi([targWidthRange],1)];
         targRect = [0,0,targWidth,targHeight];
         targRect = CenterRectOnPoint(targRect,targLoc(1),targLoc(2));
@@ -147,9 +145,6 @@ switch SOP
     case 2 % define according to patches of screen
         
 end
-
-% complexity conditions
-comp = 
 
 
 % ----------------------------------------------------------------- %
