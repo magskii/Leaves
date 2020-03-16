@@ -20,36 +20,43 @@ PsychImaging('AddTask', 'General', 'UseRetinaResolution'); % use entire display 
 
 % ----------------------------------------------------------------- %
 
-% leaf specs
-nLeaves = 4000;
-angleRange = [1,360];
-widthRange = [100,300];
-heightRange = [25,200];
-
 % TARGET SPECS
 
 targLum = 128; %round(lumRange(1)+((lumRange(2)-lumRange(1))/2)); % mid-leaf luminance
 targAngle = 45; %randi([1,360],1);
-targHeight = 120; %round(heightRange(1)+((heightRange(2)-heightRange(1))/2)); % mid-leaf height
-targWidth = 200; %round(widthRange(1)+((widthRange(2)-widthRange(1))/2)); % mid-leaf width
+targWidth = 250; %round(widthRange(1)+((widthRange(2)-widthRange(1))/2)); % mid-leaf width
+targHeight = 180; %round(heightRange(1)+((heightRange(2)-heightRange(1))/2)); % mid-leaf height
 
 % ----------------------------------------------------------------- %
 
-% LEAF COMPLEXITY SPECS:
+% LEAF COMPLEXITY SPECS
 
 % general
-compType = 2; % type        1 = luminance, 2 = size, 3 = size, etc.
+compType = 3; % type        1 = luminance, 2 = size, 3 = size, etc.
 compLevel = 1; % level      1 = low, 2 = med, 3 = high;
 
-% define low level for each complexity factor
+% define low level for each complexity factor:
+% 1 = luminance
 lumDiff = 30; % max luminance deviation from mean (target) lum
 lumRange = [targLum-lumDiff,targLum+lumDiff];
+% 2 = size (defined by width)
 sizeDiff = 50; % max width deviation (pixels) from mean (target) width
 widthRange = [targWidth-sizeDiff,targWidth+sizeDiff];
-
-angleDiff = 0;
-numberDiff = 0;
+% 3 = angle
+angleDiff = 20; % max angle deviation (degs) from target angle
+angleRange = [targAngle-angleDiff,targAngle+angleDiff];
+% 4 = number
+nLeaves = 1000;
+% 5 = shape
 shapeDiff = 0;
+
+
+% NEEDS MOVING?
+peakDistance = 0.25;
+HCD = gcd(targWidth,targHeight); % for leaf ratios
+leafShapeRatio = [round(targWidth/HCD),round(targHeight/HCD)]; %fixed width and height
+
+
 
 % switch out factor which is varied for this trial, unless it's a control
 if compLevel ~=1
@@ -72,15 +79,21 @@ if compLevel ~=1
                     sizeDiff = 150;
                     widthRange = [targWidth-sizeDiff,targWidth+sizeDiff];
             end
-        case 3
+        case 3 % angle
             switch compLevel
                 case 2
+                    angleDiff = 120;
+                    angleRange = [targAngle-angleDiff,targAngle+angleDiff];
                 case 3
+                    angleDiff = 180;
+                    angleRange = [targAngle-angleDiff,targAngle+angleDiff];
             end
-        case 4
+        case 4 % number
             switch compLevel
                 case 2
+                    nLeaves = 2000;
                 case 3
+                    nLeaves = 3000;
             end
         case 5
             switch compLevel
@@ -221,9 +234,11 @@ try
         lLum = randi([lumRange(1),lumRange(2)],1);
         lAngle = randi([angleRange(1),angleRange(2)],1);
         lWidth = randi([widthRange(1),widthRange(2)],1);
-        peakMax = round(lWidth/2)-10;
-        lPeaks = randi([10,peakMax],[1,2]);
-        lHeights = randi([heightRange(1),heightRange(2)],[1,2]);
+        % fix height and peak to maintain shape ratio
+        lHeight = round((lWidth/leafShapeRatio(1))*leafShapeRatio(2));
+        lHeights = [round(lHeight/2),round(lHeight/2)];
+        lPeak = round(lWidth*peakDistance);
+        lPeaks = [lPeak,lPeak];
         
         % draw leaf based on parameters
         leafMat = drawLeaf(lLum,lAngle,lWidth,lHeights,lPeaks);
@@ -257,7 +272,7 @@ try
     end
     
     %FOR TESTING ONLY!!
-    targLum = 1;
+    %targLum = 1;
     
     % draw and paste in target
     [baseLum,targMat] = drawEllipse(targHeight,targWidth,targLum,targAngle);
