@@ -24,8 +24,8 @@ PsychImaging('AddTask', 'General', 'UseRetinaResolution'); % use entire display 
 
 targLum = 128; %round(lumRange(1)+((lumRange(2)-lumRange(1))/2)); % mid-leaf luminance
 targAngle = 45; %randi([1,360],1);
-targWidth = 250; %round(widthRange(1)+((widthRange(2)-widthRange(1))/2)); % mid-leaf width
-targHeight = 180; %round(heightRange(1)+((heightRange(2)-heightRange(1))/2)); % mid-leaf height
+targWidth = 80; %round(widthRange(1)+((widthRange(2)-widthRange(1))/2)); % mid-leaf width
+targHeight = 60; %round(heightRange(1)+((heightRange(2)-heightRange(1))/2)); % mid-leaf height
 
 % ----------------------------------------------------------------- %
 
@@ -62,7 +62,7 @@ leafShapeRatio = [round(targWidth/HCD),round(targHeight/HCD)]; %fixed width and 
 if compLevel ~=1
     switch compType
         case 1 % luminance
-  v          switch compLevel
+            switch compLevel
                 case 2
                     lumDiff = 60;
                     lumRange = [targLum-lumDiff,targLum+lumDiff];
