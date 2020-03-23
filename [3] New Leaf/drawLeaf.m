@@ -1,6 +1,11 @@
 % function to create single leaf texture matrix
 
+% TO DO:
+%   SORT ASYMMETRIC PEAKS + HEIGHTS
+%   BLEND BETTER WITH NEW BACKGROUNDS
+
 % INPUTS:
+%   lType = type of leaf shape, determined by lines used to draw it
 %   lLum = luminance of leaf
 %   lAngle = rotation angle of leaf (degrees)
 %   lWidth = width of leaf

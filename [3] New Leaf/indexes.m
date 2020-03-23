@@ -19,3 +19,7 @@ bottom = 4;
 % target side
 simple = 0;
 complex = 1;
+% SOP
+whole = 0;
+side = 1;
+patch = 2;
