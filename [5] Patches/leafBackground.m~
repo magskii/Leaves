@@ -1,7 +1,5 @@
-
-% draw backgrounds containing multiple leaves
-
-% SORT ASYMMETRIC PEAKS + HEIGHTS
+% draws backgrounds containing multiple leaves
+% ellipse-shaped target on top
 
 clear all;
 
@@ -10,7 +8,7 @@ clear all;
 %GENERAL SET UP
 
 % screen and psychtoolbox
-backLum = 0;
+backLum = 110;
 Screen('Preference', 'SkipSyncTests', 1); % don't care about timing, so skipping sync tests is fine for now
 screenMax = max(Screen('Screens')); % set screen to be external display if applicable
 PsychImaging('PrepareConfiguration');
@@ -27,8 +25,22 @@ load indices
 
 % EXPERIMENT TYPE
 % matrices for complexity and location:
-compMat = [low,low,high,high]; % [lum,size,angle,num]
-locMat = [side,left,simple,0];
+compMat = [high,low,low,low]; % [lum,size,angle,num]
+locMat = [whole,complex,1,100,0];
+
+% if locMat(1) = whole
+%   (2) = N/A
+%   (3) = N/A
+%   (4) = N/A
+% if locMat(1) = side
+%   (2) = complex side
+%   (3) = side target is on
+%   (4) = N/A
+% if locMat(1) = patch
+%   (2) = patch complexity
+%   (3) = number of patches
+%   (4) = diameter of patches
+%   (5) = target on patch logical
 
 % ----------------------------------------------------------------- %
 
@@ -43,23 +55,18 @@ targHeight = 60; %round(heightRange(1)+((heightRange(2)-heightRange(1))/2)); % m
 % leaf shape
 lType = 1;
 peakDistance = 0.25;
-
-% leaf complexity values
-lum = [30,60,90]; % max luminance deviation from mean (target) lum
-siz = [20,40,60]; % max width deviation (pixels) from mean (target) width
-ang = [20,100,180]; % max angle deviation (degs) from target angle
-num = 100;
-num = [num,num*2,num*3]; % number of leaves on complex side
-
-% ----------------------------------------------------------------- %
-
-% DERIVED SPECS
-
-% leaf:
 HCD = gcd(targWidth,targHeight); % for leaf ratios
 leafShapeRatio = [round(targWidth/HCD),round(targHeight/HCD)]; %fixed width and height
 
-% target:
+% leaf complexity values
+lum = [30,60,90]; % max luminance deviation from mean (target) lum
+siz = [10,20,30]; % max width deviation (pixels) from mean (target) width
+ang = [20,100,180]; % max angle deviation (degs) from target angle
+num = 500; % low complexity number of leaves
+num = [num,num*2,num*3]; % number range for complex side
+
+% ----------------------------------------------------------------- %
+
 % bodge to fix drawEllipse odd number problem, can remove when fixed
 if mod(targHeight,2)
     targHeight = targHeight+1;
@@ -67,6 +74,10 @@ end
 if mod(targWidth,2)
     targWidth = targWidth+2;
 end
+
+% ----------------------------------------------------------------- %
+
+% START IMAGE GENERATION
 
 for trial = 1:(size(compMat,1))
     
@@ -80,7 +91,7 @@ for trial = 1:(size(compMat,1))
     lRange = [targLum-trialLum,targLum+trialLum];
     sRange = [targWidth-trialSiz,targWidth+trialSiz];
     aRange = [targAngle-trialAng,targAngle+trialAng];
-    nLeaves = trialNum;
+    totLeaves = trialNum;
     if SOP ~= 0 % define general side/patch things if necessary
         % low complexity specs
         SlRange = [targLum-lum(low),targLum+lum(low)];
@@ -92,9 +103,10 @@ for trial = 1:(size(compMat,1))
                 compSide = locMat(trial,2); % which side is complex       1 = left, 2 = right, 3 = top, 4 = bottom
                 targSide = locMat(trial,3); % which side does the target appear on       0 = simple side, 1 = complex side
             case 2
-                nPats = locMat(trial,2); % number of patches
-                sPats = locMat(trial,3); % radius of patches
-                targOnPat = locMat(trial,4); % whether target is on a complex patch, logical
+                patchComp = locMat(trial,2);
+                nPats = locMat(trial,3); % number of patches
+                sPats = locMat(trial,4); % radius of patches
+                targOnPat = locMat(trial,5); % whether target is on a complex patch, logical
         end
     end
     
@@ -104,7 +116,7 @@ for trial = 1:(size(compMat,1))
     % define target location properly:
     [splitWidth,splitHeight] = splitScreen(edgeBuffer,width,height);
     switch SOP
-        case 0 % anywhere on screen
+        case whole
             % define width and height ranges for target location generation
             locWidthR = [splitWidth(1),splitWidth(3)];
             locHeightR = [splitHeight(1),splitHeight(3)];
@@ -114,7 +126,7 @@ for trial = 1:(size(compMat,1))
             targLoc = [randi(targHeightRange,1),randi(targWidthRange,1)];
             targRect = [0,0,targWidth,targHeight];
             targRect = CenterRectOnPoint(targRect,targLoc(1),targLoc(2));
-        case 1 % on certain half of screen
+        case side
             switch compSide % which side has complex leaf litter
                 case left
                     wCompRange = splitWidth(1:2);
@@ -146,19 +158,43 @@ for trial = 1:(size(compMat,1))
                     targHeightRange = [hCompRange(1)+round((targHeight/2)),hCompRange(2)-round((targHeight/2))];
                     targWidthRange = [wCompRange(1)+round((targWidth/2)),wCompRange(2)-round((targWidth/2))];
             end
+            % generate target location
             targLoc = [randi(targHeightRange,1),randi(targWidthRange,1)];
             targRect = [0,0,targWidth,targHeight];
             targRect = CenterRectOnPoint(targRect,targLoc(1),targLoc(2));
             % define drawing side for leaves
-            if compMat(nInd) == 2 || compMat(nInd) == 3
-                nLeaves = nLeaves + SnLeaves;
-                drawingSide = Shuffle([zeros(1,SnLeaves),ones(1,)]);
-            else
-                drawingSide = Shuffle([zeros(1,nLeaves/2),ones(1,nLeaves/2)]);
+            drawingSide = Shuffle([zeros(1,SnLeaves),ones(1,totLeaves)]);
+            totLeaves = totLeaves + SnLeaves;
+        case patch
+            % define width and height ranges for patch and target location generation
+            locWidthR = [splitWidth(1),splitWidth(3)];
+            locHeightR = [splitHeight(1),splitHeight(3)];
+            % get patch location
+            patchHeightRange = [locHeightR(1)+round((sPats/2)),locHeightR(2)-round((sPats/2))];
+            patchWidthRange = [locWidthR(1)+round((sPats/2)),locWidthR(2)-round((sPats/2))];
+            patchLoc = [randi(patchHeightRange,1),randi(patchWidthRange,1)];
+            % generate pixel indicies within patch and outside of patch
+            switch targOnPat
+                case 0
+                    patLog = 0;
+                case 1
+                    patLog = 1;
             end
-        case 2 % define according to patches of screen
+            [outLog,patchMat] = drawEllipse(sPats,sPats,patLog,0);
+            
+            % put target on or off patch
+            
+            
+            
+            
+            targHeightRange = [locHeightR(1)+round((targHeight/2)),locHeightR(2)-round((targHeight/2))];
+            targWidthRange = [locWidthR(1)+round((targWidth/2)),locWidthR(2)-round((targWidth/2))];
+            targLoc = [randi(targHeightRange,1),randi(targWidthRange,1)];
+            targRect = [0,0,targWidth,targHeight];
+            targRect = CenterRectOnPoint(targRect,targLoc(1),targLoc(2));
             
     end
+    
     
     % ----------------------------------------------------------------- %
     
@@ -167,7 +203,7 @@ for trial = 1:(size(compMat,1))
     try
         % create blank mean-luminance display matrix (plus a bit off edge of screen)
         display = zeros(height+(edgeBuffer*2),width+(edgeBuffer*2)) + backLum;
-        for i = 1:nLeaves
+        for i = 1:totLeaves
             % define leaf location and specs
             switch SOP
                 case 0
@@ -223,7 +259,7 @@ for trial = 1:(size(compMat,1))
                 end
             end
         end
-
+        
         %FOR TESTING ONLY!!
         %targLum = 1;
         

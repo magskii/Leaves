@@ -25,8 +25,22 @@ load indices
 
 % EXPERIMENT TYPE
 % matrices for complexity and location:
-compMat = [low,low,high,low]; % [lum,size,angle,num]
-locMat = [side,right,simple,0];
+compMat = [high,low,low,low]; % [lum,size,angle,num]
+locMat = [whole,complex,1,100,0];
+
+% if locMat(1) = whole
+%   (2) = N/A
+%   (3) = N/A
+%   (4) = N/A
+% if locMat(1) = side
+%   (2) = complex side
+%   (3) = side target is on
+%   (4) = N/A
+% if locMat(1) = patch
+%   (2) = patch complexity
+%   (3) = number of patches
+%   (4) = diameter of patches
+%   (5) = target on patch logical
 
 % ----------------------------------------------------------------- %
 
@@ -89,9 +103,10 @@ for trial = 1:(size(compMat,1))
                 compSide = locMat(trial,2); % which side is complex       1 = left, 2 = right, 3 = top, 4 = bottom
                 targSide = locMat(trial,3); % which side does the target appear on       0 = simple side, 1 = complex side
             case 2
-                nPats = locMat(trial,2); % number of patches
-                sPats = locMat(trial,3); % radius of patches
-                targOnPat = locMat(trial,4); % whether target is on a complex patch, logical
+                patchComp = locMat(trial,2);
+                nPats = locMat(trial,3); % number of patches
+                sPats = locMat(trial,4); % radius of patches
+                targOnPat = locMat(trial,5); % whether target is on a complex patch, logical
         end
     end
     
@@ -101,7 +116,7 @@ for trial = 1:(size(compMat,1))
     % define target location properly:
     [splitWidth,splitHeight] = splitScreen(edgeBuffer,width,height);
     switch SOP
-        case 0 % anywhere on screen
+        case whole
             % define width and height ranges for target location generation
             locWidthR = [splitWidth(1),splitWidth(3)];
             locHeightR = [splitHeight(1),splitHeight(3)];
@@ -111,7 +126,7 @@ for trial = 1:(size(compMat,1))
             targLoc = [randi(targHeightRange,1),randi(targWidthRange,1)];
             targRect = [0,0,targWidth,targHeight];
             targRect = CenterRectOnPoint(targRect,targLoc(1),targLoc(2));
-        case 1 % on certain half of screen
+        case side
             switch compSide % which side has complex leaf litter
                 case left
                     wCompRange = splitWidth(1:2);
@@ -143,15 +158,46 @@ for trial = 1:(size(compMat,1))
                     targHeightRange = [hCompRange(1)+round((targHeight/2)),hCompRange(2)-round((targHeight/2))];
                     targWidthRange = [wCompRange(1)+round((targWidth/2)),wCompRange(2)-round((targWidth/2))];
             end
+            % generate target location
             targLoc = [randi(targHeightRange,1),randi(targWidthRange,1)];
             targRect = [0,0,targWidth,targHeight];
             targRect = CenterRectOnPoint(targRect,targLoc(1),targLoc(2));
             % define drawing side for leaves
-                drawingSide = Shuffle([zeros(1,SnLeaves),ones(1,totLeaves)]);
-                totLeaves = totLeaves + SnLeaves;
-        case 2 % define according to patches of screen
+            drawingSide = Shuffle([zeros(1,SnLeaves),ones(1,totLeaves)]);
+            totLeaves = totLeaves + SnLeaves;
+        case patch
+            % define width and height ranges for patch and target location generation
+            locWidthR = [splitWidth(1),splitWidth(3)];
+            locHeightR = [splitHeight(1),splitHeight(3)];
+            % get patch location
+            patchHeightRange = [locHeightR(1)+round((sPats/2)),locHeightR(2)-round((sPats/2))];
+            patchWidthRange = [locWidthR(1)+round((sPats/2)),locWidthR(2)-round((sPats/2))];
+            patchLoc = [randi(patchHeightRange,1),randi(patchWidthRange,1)];
+            % generate pixel indicies within patch and outside of patch
+            switch targOnPat
+                case 0
+                    patLog = 0;
+                    patDisp = ones(height+(edgeBuffer*2),width+(edgeBuffer*2));
+                case 1
+                    patLog = 1;
+                    patDisp = zeros(height+(edgeBuffer*2),width+(edgeBuffer*2));
+            end
+            [outLog,patchMat] = drawEllipse(sPats,sPats,patLog,0);
+            
+            
+            % put target on or off patch
+            
+            
+            
+            
+            targHeightRange = [locHeightR(1)+round((targHeight/2)),locHeightR(2)-round((targHeight/2))];
+            targWidthRange = [locWidthR(1)+round((targWidth/2)),locWidthR(2)-round((targWidth/2))];
+            targLoc = [randi(targHeightRange,1),randi(targWidthRange,1)];
+            targRect = [0,0,targWidth,targHeight];
+            targRect = CenterRectOnPoint(targRect,targLoc(1),targLoc(2));
             
     end
+    
     
     % ----------------------------------------------------------------- %
     
@@ -216,7 +262,7 @@ for trial = 1:(size(compMat,1))
                 end
             end
         end
-
+        
         %FOR TESTING ONLY!!
         %targLum = 1;
         
