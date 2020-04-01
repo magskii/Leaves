@@ -5,8 +5,9 @@ clear all;
 height = 1000;
 width = 2000;
 edgeBuffer = 100;
-patRad = 5;
-targOnPat = 1;
+patRad = 100;
+targOnPat = 0;
+patchComp = 1;
 
 
 % define target location properly:
@@ -42,4 +43,36 @@ patDisp = [topBuffer;patDisp;topBuffer];
 [rows,cols,vals] = find(patDisp==1); % get all co-ordinates where patDisp = 1
 targLocInd = randi(size(rows,1),1);
 targLoc = [rows(targLocInd),cols(targLocInd)];
+
+
+% --------------------------------------------------------------------- %
+
+
+leafLoc = [randi(locHeightR,1),randi(locWidthR,1)];
+
+switch patchComp % invert matrix if needed, so complex parts are 1s and simple parts are 0s
+    case 0 % simple patches
+        if targOnPat == 1 % target on complex side, so patch made up of 1s
+            % invert matrix
+            newPatDisp = ones(size(patDisp));
+            newPatDisp(find(patDisp)) = 0;
+            patDisp = newPatDisp;
+        end
+    case 1 % complex patches
+        if targOnPat == 0 % target on simple side, so patch made up of 0s
+            % invert matrix
+            newPatDisp = zeros(size(patDisp));
+            newPatDisp(find(~patDisp)) = 1;
+            patDisp = newPatDisp;
+        end
+end
+
+
+
+
+image = uint8(patDisp);
+image = image(edgeBuffer:edgeBuffer+height,edgeBuffer:edgeBuffer+width);
+imwrite(image,'test.jpg');
+
+
 

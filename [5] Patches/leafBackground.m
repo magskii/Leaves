@@ -26,7 +26,7 @@ load indices
 % EXPERIMENT TYPE
 % matrices for complexity and location:
 compMat = [high,low,low,low]; % [lum,size,angle,num]
-locMat = [patch,complex,1,100,0];
+locMat = [patch,complex,1,200,0];
 
 % if locMat(1) = whole
 %   (2) = N/A
@@ -63,7 +63,7 @@ leafShapeRatio = [round(targWidth/HCD),round(targHeight/HCD)]; %fixed width and 
 lum = [30,60,90]; % max luminance deviation from mean (target) lum
 siz = [10,20,30]; % max width deviation (pixels) from mean (target) width
 ang = [20,100,180]; % max angle deviation (degs) from target angle
-num = 500; % low complexity number of leaves
+num = 2000; % low complexity number of leaves
 num = [num,num*2,num*3]; % number range for complex side
 
 % ----------------------------------------------------------------- %
@@ -96,7 +96,7 @@ for trial = 1:(size(compMat,1))
             case 2
                 patchComp = locMat(trial,2);
                 nPats = locMat(trial,3); % number of patches
-                patsRad = locMat(trial,4); % radius of patches
+                patRad = locMat(trial,4); % radius of patches
                 targOnPat = locMat(trial,5); % whether target is on a complex patch, logical
         end
     end
@@ -189,8 +189,24 @@ for trial = 1:(size(compMat,1))
             targLoc = [rows(targLocInd),cols(targLocInd)];
             targRect = [0,0,targWidth,targHeight];
             targRect = CenterRectOnPoint(targRect,targLoc(1),targLoc(2));
+            % invert matrix if needed for drawing leaves, so complex parts are 1s and simple parts are 0s
+            switch patchComp
+                case simple % simple patches
+                    if targOnPat == 1 % target on complex side, so patch made up of 1s
+                        % invert patch matrix
+                        newPatDisp = ones(size(patDisp));
+                        newPatDisp(find(patDisp)) = 0;
+                        patDisp = newPatDisp;
+                    end
+                case 1 % complex patches
+                    if targOnPat == 0 % target on simple side, so patch made up of 0s
+                        % invert patch matrix
+                        newPatDisp = zeros(size(patDisp));
+                        newPatDisp(find(~patDisp)) = 1;
+                        patDisp = newPatDisp;
+                    end
+            end
     end
-    
     
     % ----------------------------------------------------------------- %
     
@@ -240,9 +256,31 @@ for trial = 1:(size(compMat,1))
                             lPeaks = [lPeak,lPeak];
                     end
                 case patch
-                    % GENERATE RANDOM LEAF LOCATION
-                    % IF COMPLEX, SET PARAMETERS
-                    % IF SIMPLE, SET PARAMETERS
+                    % random leaf location
+                    leafLoc = [randi(locHeightR,1),randi(locWidthR,1)];
+                    % compare to patDisp to see if simple or complex
+                    switch patDisp(leafLoc(1),leafLoc(2))
+                        case simple
+                            % define leaf paramaters within ranges
+                            lLum = randi([SlRange(1),SlRange(2)],1);
+                            lAngle = randi([SaRange(1),SaRange(2)],1);
+                            lWidth = randi([SsRange(1),SsRange(2)],1);
+                            % fix height and peak to maintain shape ratio
+                            lHeight = round((lWidth/leafShapeRatio(1))*leafShapeRatio(2));
+                            lHeights = [round(lHeight/2),round(lHeight/2)];
+                            lPeak = round(lWidth*peakDistance);
+                            lPeaks = [lPeak,lPeak];
+                        case complex
+                            % define leaf paramaters within ranges
+                            lLum = randi([lRange(1),lRange(2)],1);
+                            lAngle = randi([aRange(1),aRange(2)],1);
+                            lWidth = randi([sRange(1),sRange(2)],1);
+                            % fix height and peak to maintain shape ratio
+                            lHeight = round((lWidth/leafShapeRatio(1))*leafShapeRatio(2));
+                            lHeights = [round(lHeight/2),round(lHeight/2)];
+                            lPeak = round(lWidth*peakDistance);
+                            lPeaks = [lPeak,lPeak];
+                    end
             end
             % draw leaf based on parameters
             leafMat = drawLeaf(lType,lLum,lAngle,lWidth,lHeights,lPeaks);
