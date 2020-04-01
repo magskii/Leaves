@@ -26,7 +26,7 @@ load indices
 % EXPERIMENT TYPE
 % matrices for complexity and location:
 compMat = [high,low,low,low]; % [lum,size,angle,num]
-locMat = [whole,complex,1,100,0];
+locMat = [patch,complex,1,100,0];
 
 % if locMat(1) = whole
 %   (2) = N/A
@@ -36,10 +36,11 @@ locMat = [whole,complex,1,100,0];
 %   (2) = complex side
 %   (3) = side target is on
 %   (4) = N/A
+%   (5) = N/A
 % if locMat(1) = patch
 %   (2) = patch complexity
 %   (3) = number of patches
-%   (4) = diameter of patches
+%   (4) = radius of patches
 %   (5) = target on patch logical
 
 % ----------------------------------------------------------------- %
@@ -64,16 +65,6 @@ siz = [10,20,30]; % max width deviation (pixels) from mean (target) width
 ang = [20,100,180]; % max angle deviation (degs) from target angle
 num = 500; % low complexity number of leaves
 num = [num,num*2,num*3]; % number range for complex side
-
-% ----------------------------------------------------------------- %
-
-% bodge to fix drawEllipse odd number problem, can remove when fixed
-if mod(targHeight,2)
-    targHeight = targHeight+1;
-end
-if mod(targWidth,2)
-    targWidth = targWidth+2;
-end
 
 % ----------------------------------------------------------------- %
 
@@ -105,7 +96,7 @@ for trial = 1:(size(compMat,1))
             case 2
                 patchComp = locMat(trial,2);
                 nPats = locMat(trial,3); % number of patches
-                sPats = locMat(trial,4); % radius of patches
+                patsRad = locMat(trial,4); % radius of patches
                 targOnPat = locMat(trial,5); % whether target is on a complex patch, logical
         end
     end
@@ -170,32 +161,34 @@ for trial = 1:(size(compMat,1))
             locWidthR = [splitWidth(1),splitWidth(3)];
             locHeightR = [splitHeight(1),splitHeight(3)];
             % get patch location
-            patchHeightRange = [locHeightR(1)+round((sPats/2)),locHeightR(2)-round((sPats/2))];
-            patchWidthRange = [locWidthR(1)+round((sPats/2)),locWidthR(2)-round((sPats/2))];
+            patchHeightRange = [locHeightR(1)+round(patRad),locHeightR(2)-round(patRad)];
+            patchWidthRange = [locWidthR(1)+round(patRad),locWidthR(2)-round(patRad)];
             patchLoc = [randi(patchHeightRange,1),randi(patchWidthRange,1)];
+            patchRect = [0,0,patRad*2,patRad*2];
+            patchRect = CenterRectOnPoint(patchRect,patchLoc(1),patchLoc(2));
             % generate pixel indicies within patch and outside of patch
             switch targOnPat
                 case 0
                     patLog = 0;
-                    patDisp = ones(height+(edgeBuffer*2),width+(edgeBuffer*2));
+                    patDisp = ones(height,width);
+                    sideBuffer = ones(height,edgeBuffer);
+                    topBuffer = ones(edgeBuffer,width+(edgeBuffer*2));
                 case 1
                     patLog = 1;
-                    patDisp = zeros(height+(edgeBuffer*2),width+(edgeBuffer*2));
+                    patDisp = zeros(height,width);
+                    sideBuffer = zeros(height,edgeBuffer);
+                    topBuffer = zeros(edgeBuffer,width+(edgeBuffer*2));
             end
-            [outLog,patchMat] = drawEllipse(sPats,sPats,patLog,0);
-            
-            
-            % put target on or off patch
-            
-            
-            
-            
-            targHeightRange = [locHeightR(1)+round((targHeight/2)),locHeightR(2)-round((targHeight/2))];
-            targWidthRange = [locWidthR(1)+round((targWidth/2)),locWidthR(2)-round((targWidth/2))];
-            targLoc = [randi(targHeightRange,1),randi(targWidthRange,1)];
+            [outLog,patchMat] = drawEllipse(patRad,patRad,patLog,0);
+            patDisp(patchRect(1):patchRect(3),patchRect(2):patchRect(4)) = patchMat;
+            patDisp = [sideBuffer,patDisp,sideBuffer];
+            patDisp = [topBuffer;patDisp;topBuffer];
+            % put target in random location on or off patch
+            [rows,cols,vals] = find(patDisp==1); % get all co-ordinates where patDisp = 1
+            targLocInd = randi(size(rows,1),1); % choose random centre co-ordinate
+            targLoc = [rows(targLocInd),cols(targLocInd)];
             targRect = [0,0,targWidth,targHeight];
             targRect = CenterRectOnPoint(targRect,targLoc(1),targLoc(2));
-            
     end
     
     
@@ -209,7 +202,7 @@ for trial = 1:(size(compMat,1))
         for i = 1:totLeaves
             % define leaf location and specs
             switch SOP
-                case 0
+                case whole
                     %location
                     leafLoc = [randi(locHeightR,1),randi(locWidthR,1)];
                     % define leaf paramaters within ranges
@@ -221,7 +214,7 @@ for trial = 1:(size(compMat,1))
                     lHeights = [round(lHeight/2),round(lHeight/2)];
                     lPeak = round(lWidth*peakDistance);
                     lPeaks = [lPeak,lPeak];
-                case 1
+                case side
                     switch drawingSide(i)
                         case simple % draw on simple side
                             leafLoc = [randi(hSimpRange,1),randi(wSimpRange,1)];
@@ -246,8 +239,10 @@ for trial = 1:(size(compMat,1))
                             lPeak = round(lWidth*peakDistance);
                             lPeaks = [lPeak,lPeak];
                     end
-                case 2
-                    
+                case patch
+                    % GENERATE RANDOM LEAF LOCATION
+                    % IF COMPLEX, SET PARAMETERS
+                    % IF SIMPLE, SET PARAMETERS
             end
             % draw leaf based on parameters
             leafMat = drawLeaf(lType,lLum,lAngle,lWidth,lHeights,lPeaks);
@@ -267,7 +262,7 @@ for trial = 1:(size(compMat,1))
         %targLum = 1;
         
         % draw and paste in target
-        [baseLum,targMat] = drawEllipse(targHeight,targWidth,targLum,targAngle);
+        [baseLum,targMat] = drawEllipse(targHeight/2,targWidth/2,targLum,targAngle);
         for pixCol = 1:size(targMat,1)
             for pixRow = 1:size(targMat,2)
                 if targMat(pixCol,pixRow) == targLum

@@ -174,13 +174,17 @@ for trial = 1:(size(compMat,1))
             patchWidthRange = [locWidthR(1)+round((sPats/2)),locWidthR(2)-round((sPats/2))];
             patchLoc = [randi(patchHeightRange,1),randi(patchWidthRange,1)];
             % generate pixel indicies within patch and outside of patch
+            patchBuffer = 
             switch targOnPat
                 case 0
                     patLog = 0;
+                    patDisp = ones(height+(edgeBuffer*2),width+(edgeBuffer*2));
                 case 1
                     patLog = 1;
+                    patDisp = zeros(height+(edgeBuffer*2),width+(edgeBuffer*2));
             end
             [outLog,patchMat] = drawEllipse(sPats,sPats,patLog,0);
+            
             
             % put target on or off patch
             
@@ -206,7 +210,7 @@ for trial = 1:(size(compMat,1))
         for i = 1:totLeaves
             % define leaf location and specs
             switch SOP
-                case 0
+                case whole
                     %location
                     leafLoc = [randi(locHeightR,1),randi(locWidthR,1)];
                     % define leaf paramaters within ranges
@@ -218,7 +222,7 @@ for trial = 1:(size(compMat,1))
                     lHeights = [round(lHeight/2),round(lHeight/2)];
                     lPeak = round(lWidth*peakDistance);
                     lPeaks = [lPeak,lPeak];
-                case 1
+                case side
                     switch drawingSide(i)
                         case simple % draw on simple side
                             leafLoc = [randi(hSimpRange,1),randi(wSimpRange,1)];
@@ -243,7 +247,7 @@ for trial = 1:(size(compMat,1))
                             lPeak = round(lWidth*peakDistance);
                             lPeaks = [lPeak,lPeak];
                     end
-                case 2
+                case patch
                     
             end
             % draw leaf based on parameters
