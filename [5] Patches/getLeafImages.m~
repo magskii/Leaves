@@ -1,0 +1,41 @@
+% run leaves forever
+% program calls leafBackground function to generate as many leaf
+% backgrounds as specified
+
+
+%nReps = 10
+
+% complexity specs
+%luminance = [1:127]
+%angle = [1:180]
+%number = [0:10:4000]
+
+
+isArunGay = [1,0,1,0,1,1];
+
+for i = 1:length(isArunGay)
+    
+    result = isArunGay(i);
+    if result == 1; % Arun is gay
+        fprintf('arun is gay\n%s')
+    else
+        fprintf('arun is bisexual\n%s')
+    end
+    
+end
+
+
+
+keyDown = 0;
+
+while keyDown = 0
+    
+    checkKey
+    
+    if keyDown = 1
+        break
+    end
+    
+end
+
+
