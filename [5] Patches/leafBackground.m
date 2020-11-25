@@ -8,7 +8,7 @@ clear all;
 %GENERAL SET UP
 
 % screen and psychtoolbox
-backLum = 110;
+backLum = 210;
 Screen('Preference', 'SkipSyncTests', 1); % don't care about timing, so skipping sync tests is fine for now
 screenMax = max(Screen('Screens')); % set screen to be external display if applicable
 PsychImaging('PrepareConfiguration');
@@ -25,7 +25,7 @@ load indices
 
 % EXPERIMENT TYPE
 % matrices for complexity and location:
-compMat = [high,low,low,low]; % [lum,size,angle,num]
+compMat = [low,low,low,low]; % [lum,size,angle,num]
 locMat = [whole,complex,1,200,0];
 
 % if locMat(1) = whole
@@ -48,10 +48,10 @@ locMat = [whole,complex,1,200,0];
 % TARGET AND LEAF SPECS
 
 % target
-targLum = 128; %round(lumRange(1)+((lumRange(2)-lumRange(1))/2)); % mid-leaf luminance
+targLum = 100; %round(lumRange(1)+((lumRange(2)-lumRange(1))/2)); % mid-leaf luminance
 targAngle = 45; %randi([1,360],1);
-targWidth = 200; %round(widthRange(1)+((widthRange(2)-widthRange(1))/2)); % mid-leaf width
-targHeight = 150; %round(heightRange(1)+((heightRange(2)-heightRange(1))/2)); % mid-leaf height
+targWidth = 80; %round(widthRange(1)+((widthRange(2)-widthRange(1))/2)); % mid-leaf width
+targHeight = 60; %round(heightRange(1)+((heightRange(2)-heightRange(1))/2)); % mid-leaf height
 
 % leaf shape
 lType = 1;
@@ -63,7 +63,7 @@ leafShapeRatio = [round(targWidth/HCD),round(targHeight/HCD)]; %fixed width and 
 lum = [30,60,90]; % max luminance deviation from mean (target) lum
 siz = [10,20,30]; % max width deviation (pixels) from mean (target) width
 ang = [20,100,180]; % max angle deviation (degs) from target angle
-num = 1000; % low complexity number of leaves
+num = 10; % low complexity number of leaves
 num = [num,num*2,num*3]; % number range for complex side
 
 % ----------------------------------------------------------------- %
