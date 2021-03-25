@@ -30,5 +30,8 @@ texMat = texMat + lLum;
 
 % rotate leaf matrix
 leafMat = imrotate(texMat,lAngle,'bilinear');
-
+for i = 1:numel(leafMat) % convert back to all same luminance (makes edges more jaggedy, but removes edge artifacts after pasting)
+    if leafMat(i) > 0
+        leafMat(i) = lLum;
+    end
 end

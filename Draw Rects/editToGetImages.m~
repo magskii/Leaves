@@ -8,7 +8,7 @@ clear all;
 %GENERAL SET UP
 
 % screen and psychtoolbox
-backLum = 10%210;
+backLum = 210;
 Screen('Preference', 'SkipSyncTests', 1); % don't care about timing, so skipping sync tests is fine for now
 screenMax = max(Screen('Screens')); % set screen to be external display if applicable
 PsychImaging('PrepareConfiguration');
@@ -158,10 +158,9 @@ for rep = 1
                 image = uint8(display);
                 image = image(edgeBuffer:edgeBuffer+height,edgeBuffer:edgeBuffer+width);
                 image = cur2lin(image);
-                rgbimage = cat(3,image,image,image);
-                %cutImage = image 
+                cutImage = image 
                 imName = ['rep',num2str(rep),'_varying',num2str(compType),'_num',num2str(trialNum),'_lum',num2str(trialLum),'_ang',num2str(trialAng)];
-                imwrite(rgbimage,'test.jpg');
+                imwrite(image,'test.jpg');
                 % throw all onto screen
                 dispTexture = Screen('MakeTexture',w,display);
                 Screen('DrawTexture',w,dispTexture);
